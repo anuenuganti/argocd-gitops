@@ -98,6 +98,7 @@ kubectl edit deployment myapp -n myapp
 #update replica count and save the changes
 #Verify the ArgoCD UI and you should see that it gets updated initially and then restored back to the count defined in manifest file in repo.
 ```
+![ArgoCD UI Displaying Components deployed in Cluster](images/Argocd-ui.png)
 
 </br>
 
