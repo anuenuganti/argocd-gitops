@@ -1,4 +1,4 @@
-## ArgoCD
+## ArgoCD - Why is it a preferred Continous Deployment tool for Kubernetes containerized applications?
 Argo CD is referred to as a "GitOps CD" tool because it uses Git repositories as the single source of truth to define the desired application state and automates the process of matching that state to a live Kubernetes cluster.   
 It is specifically designed to implement the GitOps methodology for Continuous Delivery (CD). 
 
@@ -9,8 +9,10 @@ Here is why it fits the definition:
 - Declarative Approach: It enforces a GitOps workflow where infrastructure and applications are defined declaratively, providing auditability and easy rollbacks. 
 - Argo CD bridges the gap between Git and Kubernetes, making it a foundational tool for implementing GitOps. 
   ---
-
-  
+## Step 1: Install ArgoCD in K8s Cluster
+Like other containerized applications, ArgoCD is available through Manifest files and you can deploy it in the Kubernetes cluster.
+Create a namespace 'ArgoCD' and deploy the ArgoCD manifest files using commands described below.
+Note: Here you are using your local Minikube cluster.
 #### Commands
 
 ```bash
@@ -27,9 +29,46 @@ kubectl port-forward svc/argocd-server 8080:443 -n argocd
 # login with 'admin' user and below token (as in documentation):
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode && echo
 
-# you can change and delete init password
+# you can change and delete init password if you want to.
+
 
 ```
+## Step 2: Configure ArgoCD to point using Custom Resource Definition(CRD)
+Note: Kubernetes comes with built in resources such as deployments, pods and services and CRD allows users to extend the Kubernetes API by creating new object types and thus allowing 
+the use of external software more affectively by integrating new custom objects as Kubernetes components inside the cluster.
+Similarly ArgoCD comes with Custom Resource definition that is created automatically when you install ArgoCD, and you can create 
+
+You need to create an object of kind 'Application' using the CRD template and define the values(Sourcee git repo, destination cluster/s, config values etc.)
+Please see the below file and check the inline comments for details.
+```
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: myapp-argo-application
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/anuenuganti/argocd-gitops.git      #source git repo url
+    targetRevision: HEAD
+    path: dev
+  destination: 
+    server: https://kubernetes.default.svc         #destination K8s cluster url, here: we are deploying the application to the same cluster where ArgoCD is installed.
+    namespace: myapp
+
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true        #If the namespace specified in destination cluster is not already there, creates it.
+
+    automated:
+      selfHeal: true              #If a change is accidentally made to the cluster by running Kubectl commands, ArgoCD restores the status back to match the git Repo
+      prune: true                 #If a resource or a manifest file is deleted from the repo, ArgoCD deletes it from the cluster
+```
+
+
+## Step 3: Test the ArgoCD action by updating Manifest files in the Git Repo
+
 </br>
 
 #### Links
