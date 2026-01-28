@@ -30,6 +30,7 @@ kubectl port-forward svc/argocd-server 8080:443 -n argocd
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode && echo
 
 # you can change and delete init password if you want to.
+#The default ArgoCD scheduled sync time with Gitrepo is 3 min, you can edit the argocd config map to change/reduce this value if needed. or use 'refresh'/'sync' options in ui to sync immediately.
 
 
 ```
