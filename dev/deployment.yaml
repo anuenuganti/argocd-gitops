@@ -16,6 +16,6 @@ spec:
       - name: dockerhub-secret
       containers:
       - name: myapp
-        image: anusrini/java-maven-app:1.1.13-7
+        image: anusrini/java-maven-app:1.1.15-7
         ports:
         - containerPort: 8080
