@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: myapp
-        image: anusrini/java-maven-app
+        image: anusrini/anusrini/java-maven-app:1.1.13-5
         ports:
         - containerPort: 8080
